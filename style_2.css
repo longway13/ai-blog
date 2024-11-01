@@ -1,0 +1,153 @@
+body {
+    font-family: 'Inter', sans-serif;
+    color: #333;
+    background-color: #ffffff;
+    line-height: 1.6;
+    margin: 0;
+    padding: 5% 20%;
+  }
+
+  .icl-figures {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: center;
+    border-radius: none;
+  }
+  .blog-title {
+  color: #333;
+  font-size: 2rem;
+  }
+  .header-nav {
+    display: grid;
+    grid-template-columns: auto 2fr;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+  .header-nav .header-nav-item {
+    color: #333;
+    font-size: 1.2rem;
+    grid-column: 3;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem; /* 좌우 패딩 추가 */
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    color: #4a4a4a;
+    line-height: 1.4;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+  }
+  .post-meta {
+    margin-bottom: 2rem;
+  } 
+
+  a {
+    color: #0057b7;
+    text-decoration: none;
+    transition: color 0.2s ease-in;
+  }
+  
+  a:hover {
+    color: #003a80;
+  }
+
+
+  button, .button {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid transparent;
+    background-color: #0076df;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+  }
+  
+  button:hover, .button:hover {
+    background-color: #005bb5;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  input, select, textarea {
+    font-size: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #0076df;
+    box-shadow: 0 0 5px rgba(0, 118, 223, 0.2);
+  }
+  
+  blockquote {
+    font-size: 1rem;
+    color: #555;
+    background: #fafafa;
+    border-left: 5px solid #ccc;
+    margin: 1em 0;
+    padding: 0.5em 1em;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+  }
+  
+  table th, table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+  }
+  
+  hr {
+    border: 0;
+    height: 1px;
+    background-color: #eaeaea;
+    margin: 2rem 0;
+  }
+  
+  img {
+    max-width: 100%;
+    border-radius: 2px;
+  }
+  
+  code, pre {
+    font-family: 'Source Code Pro', monospace;
+    background-color: #f4f4f4;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  .figure2-right {
+    line-height: 0.9;
+    font-size: 0.8em;
+  }
+
+  footer {
+    background-color: #f1f1f1;
+    color: #7a7a7a;
+    padding: 2rem 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  
+  @media (min-width: 768px) {
+    .container {
+      max-width: 1200px;
+      padding: 0 3rem; /* 데스크탑에서 좌우 여백 추가 */
+    }
+  }
+  

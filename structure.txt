@@ -1,0 +1,6 @@
+-Nav Bar
+- Title
+- Authors 
+- Date 
+-Figure 
+-  

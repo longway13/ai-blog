@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Gwanwoo's AI Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="The Gwanwoo's AI Blog">
+    <meta name="author" content="Gwanwoo">
+    <meta name="keywords" content="">
+ 
+    <link rel="stylesheet" href="style_2.css" >
+    <link rel="stylesheet" href="style_1.css" >
+
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Lato:900,300' rel='stylesheet' type='text/css'>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          processEscapes: true
+        },
+        messageStyle: "none",
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js">
+    </script>
+
+
+</head>
+
+<body class="site">
+
+  <div class="site-wrap">
+    <header class="site-header px2 px-responsive">
+      <div class="mt2 wrap">
+        <div class="measure header-nav">
+            <span class="blog-title">Gwanwoo's Blog</span>
+            <a class = "header-nav-item" href="https://longway13.github.io/homepage/">Homepage</a>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </header>
+  
+
+  <div class="post p2 p-responsive wrap " role="main">
+    <div class="measure">
+    <div class="post-header mb2">
+  
+  <h1>Rethinking the Role of Demonstrations:<br>
+  What Makes In-Context Learning Work?</h1>
+  <div class="post-meta">
+  
+  Sewon Min, Xinxi Lyu, Ari Holtzman, Mikel Artetxe, Mike Lewis, Hannaneh Hajishirzi, and Luke Zettlemoyer &nbsp;&nbsp;
+  
+  Feb 25, 2022
+  
+  </div>
+  <p class="Intro of blog post">
+    I will introduce the fascinating NLP paper about large language models.
+  </p>
+  <p>
+    Since <a href="https://arxiv.org/abs/2005.14165">Brown et al.</a> introduced the method to prompt language model with a few examples (input - desired response), known as in-context learning,  there has been a lot of research (e.g., <a href="https://arxiv.org/abs/2201.11903">Wei et al.</a>, <a href="https://arxiv.org/pdf/2203.11171">Wang et al.</a>) using this approach. In-context learning has also shown the potential on various domains.
+  </p>
+  <p>
+    However, there is little understanding of <strong><i>why in-context learning works</i></strong>. 
+  </p>
+    This research identifies demonstration aspects that may impact the performance of in-context-learning, conducting various experiments and quantitative analyses. Let's dive into the details.
+  </p>
+</div>
+
+<!-- <p>수식: \( x^2 + y^2 = z^2 \)</p>
+<p>argmax<sub>y ∈ C</sub> P(y|x)</p>
+<p>argmax<sub>y ∈ C</sub> P(y|x<sub>1</sub>, y<sub>1</sub>, …, x<sub>k</sub>, y<sub>k</sub>, x)</p> -->
+
+<article class="post-content">
+
+<h2 id="results">In-Context Learning (ICL)</h2> 
+<p>
+  Before diving into the details, let me review the ICL first. It is prompting method that make the model learn the task in inference time using demonstrations. The demonstrations are (human input, desired model output) pairs. Model learn what input will be inputted and how to generate the desired output. 
+</p>
+
+<p class="figure" style="text-align:center;">
+    <img src="/figures/icl-preview.png" width="99%" height="99%" />
+    <br />
+    <i style="font-size: 0.9em;">Figure 1:Illustration of in-context learning from </i><a href="https://arxiv.org/abs/2301.00234">Dong et al.</a>
+</p>
+
+<p>
+  In figure 1, the task is sentiment analysis and a few demonstrations are given. Model gets a sense of the task by observing review-sentiment pairs. 
+
+<p class="figure figure2-right" style="text-align:center;">
+    <img src="/figures/icl-handmade.svg" width="99%" height="auto" />
+    <br />
+    <i style="font-size: 0.9em; line-height: 0.4;">Figure 2: Informal vizualization to aid understanding. The true space refers to the space where the probability is 1 that the model outputs the gold answer. The space conditioned solely by instructions differs greatly from the true space, but with demonstrations, the corresponding space becomes much closer to the true space.</i>
+</p>
+<p>
+  In figure 2, for easier understanding, I set the true space to the space where the probability is 1 that the model outputs the gold answer. The space conditioned solely by instructions differs greatly from the true space, but with demonstrations, the corresponding space becomes much closer to the true space.  
+  This means that both the instruction and instruction w/ demonstrations guide the model to learn the task. With demonstrations, the model is conditioned more precisely to the task.  
+</p>
+
+<h2>Essential finding</h2>
+<p class="figure" style="text-align:center;">
+  <!-- The writing format of figure  -->
+  <img src="/figures/rethinking.svg" width="90%" />
+  <br />
+  <i style="font-size: 0.9em;">Figure 3: ICL with ground-truth labels vs. ICL with incorrect labels.</i>
+  <!-- The writing format of figure -->
+</p>
+<p class="finding">
+  To spark your interest, I share the most interesting finding of this paper. They find that ground-truth labels counter-intuitively are not necessary for in-context learning. A sufficient number of their experiments demonstrate this result. It is really interesting because ground-truth labels are very important in supervised learning. 
+</p>
+
+<h2 id="experiment">Experimental Setup</h2>
+<p>
+<strong>Model</strong> : They use two inference methods direct<sup>*</sup> and channel<sup>*</sup> (<a href="https://arxiv.org/abs/2108.04106">Min et al.</a>) on 6 decoder-only language models. The sizes vary from 774M to 175B.  They include the largest dense LM (GPT-3 closed) and (fairest 13B open-sourced) at the time of conducting. experiments. <br />
+<p style="margin-top: -1em; line-height: 1.2;">
+  <span style="font-size: 0.8em;">* Direct is a normal inferencemethod that model computes the likelihood of the label given the input. </span> <br />
+  <span style="font-size: 0.8em;">* Channel is a method that model computes conditional probability of the given the label</span></p>
+<br />
+<strong>Dataset</strong> :
+They evaluate on 26 datasets, including sentiment analysis, paraphrase detection, natural language inference, among others, from the well-studied benchmark GLUE. They cover diverse domains including science, finance and more.
+All of datasets are classification and multi-choice formats.
+They can more easily define input-label correspondence compared to free-form generation tasks. 
+</p>
+
+<h2 id="results">The model doesn't understand input-label correspondence</h2>
+
+<p>
+  To find out the impact of <strong>correctly-paired</strong> demonstrations, they compare the following three methods. 
+</p>
+<p>
+  <strong>No demonstrations</strong> is a zero shot setting. The prediction is output via <strong><i>argmax<sub>y ∈ C</sub>P(y|x)</i></strong> where x is the user query and <i>C</i> is the set of candidate labels.<br>
+
+  <strong>Demonstrations w/ gold labels</strong> are typical in-context learning method with <i>k</i> labeled examples (x<sub>1</sub>, y<sub>1</sub>) &hellip; (x<sub>k</sub>, y<sub>k</sub>). A concatenation of <i>k</i> pairs is used to make a prediction via <strong><i>argmax<sub>y∈<i>C </i></sub>P(y|x<sub>1</sub>, y<sub>1</sub>, …, x<sub>k</sub>, y<sub>k</sub>, x)</i></strong>. <br>
+
+  <strong>Demonstrations w/ random labels</strong> are few shot setting with <i>k</i> random labeled examples. Each (x<sub>i</sub>) is paired with (&#x0079;&#x0303;<sub>i</sub>) that is randomly sampled from <i>C</i>. A concatenation of (x<sub>1</sub>,  &#x0079;&#x0303;<sub>1</sub>, …, x<sub>k</sub>,  &#x0079;&#x0303;<sub>k</sub>, x) is used to make a prediction via <strong><i>argmax<sub>y∈<i>C </i></sub>P(y|x<sub>1</sub>, &#x0079;&#x0303;<sub>1</sub>, …, x<sub>k</sub>, &#x0079;&#x0303;<sub>k</sub>, x)</i></strong>.
+</p>
+<p class="figure" style="text-align:center;">
+    <img src="figures/main_cls_3.png" width="90%" />
+    <img src="figures/main_mc_3.png" width="90%" />
+
+    <br />
+    <i>Figure 4: Results when using no-demonstrations, demonstrations with gold labels, and demonstrations with random labels in classification tasks and multi-choice tasks. Model performance with random labels is very close to performance with gold labels. <a href="https://arxiv.org/pdf/2202.12837">Min et al.</a></i> 
+</p>
+<p> The figure 4 shows that the model performance with random labels is very close or slightly worse than the performance with gold labels. It shows that the existence of demostrations is helpful but the gold-label demonstrations are not necessary. 
+</p>
+
+<p>
+They conducted various ablation studies to strengthen the hypothesis that gold-label demonstrations are not necessary. 
+</p>
+<p class="figure" style="text-align:center;">
+  <img src="figures/abl_accuracy.png" width="90%" />
+  <br />
+  <i>Figure 5: Results with varying number of correct labels in the demonstrations. <a href="https://arxiv.org/pdf/2202.12837">Min et al.</a></i> 
+</p>
+<p>
+  They conducted ablation study with varying percentage of correct labels, specifically at 100%, 75%, 50% and 0%. Figure 5 shows that model performance is insensitive to this ablation. The interesting point this study gives is  <strong>using incorrect labels always outperforms using no demonstrations (zero-shot)</strong>. 
+</p>
+<p class="figure" style="text-align:center;">
+  <img src="figures/abl_k_cls.png" width="45%" />
+  <img src="figures/abl_k_mc.png" width="45%" />
+  <br />
+  <i>Figure 6: Results with varying number of demonstrations (k). Models that are the best in each task category (Channel MetaICL and Direct GPT-J, respectively) are used. <a href="https://arxiv.org/pdf/2202.12837">Min et al.</a></i> 
+</p>
+
+<p>
+  They also conducted ablation study with varying number of demonstrations (k), specifically at 0, 4, 8, 16 and 32. The results are shown in Figure 6.
+  The performance gap between them is in the range of <span style="color:blue;">0.8%-1.6%</span>. <br>
+  In k &lt; 8, model performance increases significantly as k increases regardless of the correctness of demonstrations. In k &ge; 8, no additional performance gain is observed as k increases. <br>
+  They hypothesize that the larger labeled data is beneficial mainly for supervising the input-label correspondence. Other components like the example inputs, example outputs and output format could be learned only using small demonstrations. So even though they increase k at most 32, model doesn't learn input-label correspondence perfectly and no more performance increase is observed. 
+</p>
+
+<h2 id="results">Other aspects of Demonstrations</h2>
+
+<p>
+  They also examined other aspects of demonstraions that affect the model's performance of in-context learning. They identify four factors including <span style="color:rgb(76, 112, 229);">input-label mapping</span> we previously discussed, <span style="color:rgb(76, 112, 229);">the distribution of the input text</span>, <span style="color:rgb(76, 112, 229);">the label space</span>, and others. Let's see other factors.
+</p> 
+<p><strong>The distribution of the input text</strong>:  Underlying distribution that x<sub>i</sub> ... x<sub>k</sub> are from.</p>
+<p class="figure" style="text-align:center;">
+  <img src="figures/abl_input_total.png" alt="">
+  <br />
+  <i>Figure 7: Impact of the distribution of the inputs. <a href="https://arxiv.org/pdf/2202.12837">Min et al.</a></i> 
+</p>
+<p>
+  They experiment with out-of-distribution (OOD) inputs instead of texts in unlabeled training data. OOD sentences are randomly sampled from external corpus. 
+</p>
+<p>
+   Using OOD inputs significantly drops the performance when Channel MetaICL, Direct GPT-J and Channel GPT-J are used. In the case of Direct GPT-J, using OOD is even worse than using no demonstrations. 
+</p>
+<p>
+  This suggests that the distribution of the input text is an important factor for performance gains. <br> 
+  Let's think about the process of training language model. <span style="color:rgb(48, 181, 204);">LM always conditioned on the in-distribution text during training.</span> So, in-distribution text makes the task closer to language modeling. 
+</p>
+
+<p>
+
+</p>
+
+<p><strong>The label space</strong>:  The space covered by the labels (y<sub>1</sub>, ... y<sub>k</sub>).
+</p>
+<p class="figure" style="text-align:center;">
+  <img src="figures/abl_label_total.png" alt="">
+  <br />
+  <i>Figure 8: Impact of the label space. <a href="https://arxiv.org/pdf/2202.12837">Min et al.</a></i> 
+</p>
+ They experiment with demonstrations w/ random English words that use random enlgish words as labels for all k pairs.<br />
+ With direct models, the performance gap between using random labels within the label space and using random English words is significant. It means that knowing the label space contributes to the performance gains. We could get a sense on conditional probability of direct method. The model prediction is based on <i>P(y|x<sub>1</sub>, y<sub>1</sub>, …, x<sub>k</sub>, y<sub>k</sub>, x)</i>. It needs to predict the target label, so if the model is conditioned on the wrong label, its performance drops.<br />
+ With channel models, the performance gap between using random labels within the label space and using random English words is in range of 0-2%. The model prediction is based on <i>P(x|x<sub>1</sub>, y<sub>1</sub>, …, x<sub>k</sub>, y<sub>k</sub>, y)</i>. It functions by predicting the input in terms of the label rather tan predicting a label. So. the importance of knowing label space is relatively lower than that of direct models. 
+
+
+
+<h2 id="limitations">Limitations</h2>
+
+<p> The evaluation tasks they used have the same property that the input is real natural language text, e.g., <i>sentiment analysis</i> and <i>paraphrase detection</i>. And the output is a single label, e.g., <i>positive</i> or <i>negative</i>. Maybe the model doesn't need to understand the input-label correspondence to predict well. Other tasks with more limited inputs that require more complex understanding may use the ground-truth labels more.
+</p>
+
+<p>
+  This paper report macro-level analysis using the average performance across all tasks. We can't identify whether the model really use the specific aspects of demonstrations or not. And the model's thought process to predict the output 
+</p>  
+  All of experiments are classification and multi-choice tasks, further research on other tasks is needed to verify the generalization of the results. 
+</p>
+<h2 id="reference">Reference</h2>
+<p>
+  <p>Min, S., Lyu, X., Holtzman, A., Artetxe, M., Lewis, M., Hajishirzi, H., & Zettlemoyer, L. (2022). Rethinking the role of demonstrations: What makes in-context learning work?. arXiv preprint arXiv:2202.12837.</p>
+  <p>Min, S., Lewis, M., Hajishirzi, H., & Zettlemoyer, L. (2021). Noisy channel language model prompting for few-shot text classification. arXiv preprint arXiv:2108.04106.</p>
+  <p>Min, S., Lewis, M., Zettlemoyer, L., & Hajishirzi, H. (2021). Metaicl: Learning to learn in context. arXiv preprint arXiv:2110.15943.
+  </p>
+  <p>Brown, T. B. (2020). Language models are few-shot learners. arXiv preprint arXiv:2005.14165.</p>
+  <p>Dong, Q., Li, L., Dai, D., Zheng, C., Ma, J., Li, R., ... & Sui, Z. (2022). A survey on in-context learning. arXiv preprint arXiv:2301.00234.</p>
+</p>
+<p><strong>Learn more here: <a href="https://arxiv.org/pdf/2202.12837">[ paper ]</a></strong></p>
+<hr />
+
+
+</article>
+      </div>
+    </div>
+  </div>
+
+
+
+  
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-101338021-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  
+</body>
+</html>
