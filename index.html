@@ -64,27 +64,23 @@
   
   </div>
   <p class="Intro of blog post">
-    I will introduce the fascinating NLP paper about large language models.
+    I will introduce the fascinating NLP paper on large language models.
   </p>
   <p>
-    Since <a href="https://arxiv.org/abs/2005.14165">Brown et al.</a> introduced the method to prompt language model with a few examples (input - desired response), known as in-context learning,  there has been a lot of research (e.g., <a href="https://arxiv.org/abs/2201.11903">Wei et al.</a>, <a href="https://arxiv.org/pdf/2203.11171">Wang et al.</a>) using this approach. In-context learning has also shown the potential on various domains.
+    Since <a href="https://arxiv.org/abs/2005.14165">Brown et al.</a> introduced the method to prompt language model with a few examples (input - desired response), known as in-context learning,  there has been a lot of research (e.g., <a href="https://arxiv.org/abs/2201.11903">Wei et al.</a>, <a href="https://arxiv.org/pdf/2203.11171">Wang et al.</a>) employing this approach. In-context learning has also shown the potential across various domains.
   </p>
   <p>
-    However, there is little understanding of <strong><i>why in-context learning works</i></strong>. 
+    However, there is still little understanding of <strong><i>why in-context learning works</i></strong>. 
   </p>
-    This research identifies demonstration aspects that may impact the performance of in-context-learning, conducting various experiments and quantitative analyses. Let's dive into the details.
+    This research identifies aspects of demonstrations that may impact in-context learning performance through various experiments and quantitative analyses. Let's dive into the details.
   </p>
 </div>
-
-<!-- <p>수식: \( x^2 + y^2 = z^2 \)</p>
-<p>argmax<sub>y ∈ C</sub> P(y|x)</p>
-<p>argmax<sub>y ∈ C</sub> P(y|x<sub>1</sub>, y<sub>1</sub>, …, x<sub>k</sub>, y<sub>k</sub>, x)</p> -->
 
 <article class="post-content">
 
 <h2 id="results">In-Context Learning (ICL)</h2> 
 <p>
-  Before diving into the details, let me review the ICL first. It is prompting method that make the model learn the task in inference time using demonstrations. The demonstrations are (human input, desired model output) pairs. Model learn what input will be inputted and how to generate the desired output. 
+  Before diving into the details, let me first review in-context learning. It is a prompting method that enables the model to learn the task iat inference time using demonstrations. The demonstrations are just examples that consist of (human input, desired model output) pairs. The model learns what input will be given and how to generate the desired output. 
 </p>
 
 <p class="figure" style="text-align:center;">
@@ -94,16 +90,16 @@
 </p>
 
 <p>
-  In figure 1, the task is sentiment analysis and a few demonstrations are given. Model gets a sense of the task by observing review-sentiment pairs. 
+  In figure 1, the task is sentiment analysis and a few demonstrations are provided. The model learns the sentiment analysis task from these examples and generates appropriate output. Without demonstrations, model may struggle to predict accurately. It is <i style="color:rgb(48, 181, 204);">in-context learning</i>. 
 
 <p class="figure figure2-right" style="text-align:center;">
     <img src="/figures/icl-handmade.svg" width="99%" height="auto" />
     <br />
-    <i style="font-size: 0.9em; line-height: 0.4;">Figure 2: Informal vizualization to aid understanding. The true space refers to the space where the probability is 1 that the model outputs the gold answer. The space conditioned solely by instructions differs greatly from the true space, but with demonstrations, the corresponding space becomes much closer to the true space.</i>
+    <i style="font-size: 0.9em; line-height: 0.4;">Figure 2: Informal visualization to aid understanding. The true space refers to the space where the probability of the model generating the gold answer is 1. The space conditioned solely by on instructions differs greatly from the true space, but with demonstrations, the corresponding space becomes much closer to the true space.</i>
 </p>
 <p>
-  In figure 2, for easier understanding, I set the true space to the space where the probability is 1 that the model outputs the gold answer. The space conditioned solely by instructions differs greatly from the true space, but with demonstrations, the corresponding space becomes much closer to the true space.  
-  This means that both the instruction and instruction w/ demonstrations guide the model to learn the task. With demonstrations, the model is conditioned more precisely to the task.  
+  In figure 2, for easier understanding, I set the <i>true space</i> as the space where the probability of the model generating the gold answer is 1. The space conditioned solely on instructions differs greatly from the true space, but with demonstrations, the corresponding space becomes much closer to the true space.  
+  This indicates that both instruction alone and instruction with demonstrations help guide the model to learn the task. With demonstrations, the model's prediction is conditioned more precisely to the task.  
 </p>
 
 <h2>Essential finding</h2>
@@ -115,33 +111,32 @@
   <!-- The writing format of figure -->
 </p>
 <p class="finding">
-  To spark your interest, I share the most interesting finding of this paper. They find that ground-truth labels counter-intuitively are not necessary for in-context learning. A sufficient number of their experiments demonstrate this result. It is really interesting because ground-truth labels are very important in supervised learning. 
+  To spark your interest, I share one of the most intriguing findings of this paper. The authors discovered that ground-truth labels are, counter-intuitively, not necessary for in-context learning. A sufficient number of experiments support this finding. This result is fascinating because, ground-truth labels are crucial in supervised learning. 
 </p>
 
 <h2 id="experiment">Experimental Setup</h2>
 <p>
-<strong>Model</strong> : They use two inference methods direct<sup>*</sup> and channel<sup>*</sup> (<a href="https://arxiv.org/abs/2108.04106">Min et al.</a>) on 6 decoder-only language models. The sizes vary from 774M to 175B.  They include the largest dense LM (GPT-3 closed) and (fairest 13B open-sourced) at the time of conducting. experiments. <br />
+<strong>Model</strong> : They use two inference methods direct<sup>*</sup> and channel<sup>*</sup> (<a href="https://arxiv.org/abs/2108.04106">Min et al.</a>) on 6 decoder-only language models. The model sizes vary from 774M to 175B.  They include the largest dense LM (GPT-3 closed) and (fairseq 13B open-sourced) at the time of conducting experiments. <br />
 <p style="margin-top: -1em; line-height: 1.2;">
   <span style="font-size: 0.8em;">* Direct is a normal inferencemethod that model computes the likelihood of the label given the input. </span> <br />
   <span style="font-size: 0.8em;">* Channel is a method that model computes conditional probability of the given the label</span></p>
 <br />
 <strong>Dataset</strong> :
-They evaluate on 26 datasets, including sentiment analysis, paraphrase detection, natural language inference, among others, from the well-studied benchmark GLUE. They cover diverse domains including science, finance and more.
-All of datasets are classification and multi-choice formats.
-They can more easily define input-label correspondence compared to free-form generation tasks. 
+They evaluate on 26 datasets, including sentiment analysis, paraphrase detection, natural language inference, among others, from the well-known benchmark GLUE. These datasets cover diverse domains, including science, finance and more.
+All datasets are classification and multi-choice formats, which allow for easier definition of input-label correspondence compared to free-form generation tasks.
 </p>
 
-<h2 id="results">The model doesn't understand input-label correspondence</h2>
+<h2 id="results">The language model doesn't understand input-label correspondence</h2>
 
 <p>
-  To find out the impact of <strong>correctly-paired</strong> demonstrations, they compare the following three methods. 
+  The authors mainly focus on the impact of <strong>correctly-paired</strong> demonstrations on performance gain; in other words, they seem to be exploring whether the model grasps the input-label correspondence. For this purpose, they compare the following three methods. 
 </p>
 <p>
-  <strong>No demonstrations</strong> is a zero shot setting. The prediction is output via <strong><i>argmax<sub>y ∈ C</sub>P(y|x)</i></strong> where x is the user query and <i>C</i> is the set of candidate labels.<br>
+  <strong style="color:rgb(48, 181, 204);">No demonstrations</strong> is a zero-shot setting. The prediction is output via <strong><i>argmax<sub>y ∈ C</sub>P(y|x)</i></strong> where x is the user query and <i>C</i> is the set of candidate labels.<br>
 
-  <strong>Demonstrations w/ gold labels</strong> are typical in-context learning method with <i>k</i> labeled examples (x<sub>1</sub>, y<sub>1</sub>) &hellip; (x<sub>k</sub>, y<sub>k</sub>). A concatenation of <i>k</i> pairs is used to make a prediction via <strong><i>argmax<sub>y∈<i>C </i></sub>P(y|x<sub>1</sub>, y<sub>1</sub>, …, x<sub>k</sub>, y<sub>k</sub>, x)</i></strong>. <br>
+  <strong style="color:rgb(48, 181, 204);">Demonstrations with gold labels</strong> are typical in-context learning method with <i>k</i> labeled examples (x<sub>1</sub>, y<sub>1</sub>) &hellip; (x<sub>k</sub>, y<sub>k</sub>). A concatenation of <i>k</i> pairs is used to make a prediction via <strong><i>argmax<sub>y∈<i>C </i></sub>P(y|x<sub>1</sub>, y<sub>1</sub>, …, x<sub>k</sub>, y<sub>k</sub>, x)</i></strong>. <br>
 
-  <strong>Demonstrations w/ random labels</strong> are few shot setting with <i>k</i> random labeled examples. Each (x<sub>i</sub>) is paired with (&#x0079;&#x0303;<sub>i</sub>) that is randomly sampled from <i>C</i>. A concatenation of (x<sub>1</sub>,  &#x0079;&#x0303;<sub>1</sub>, …, x<sub>k</sub>,  &#x0079;&#x0303;<sub>k</sub>, x) is used to make a prediction via <strong><i>argmax<sub>y∈<i>C </i></sub>P(y|x<sub>1</sub>, &#x0079;&#x0303;<sub>1</sub>, …, x<sub>k</sub>, &#x0079;&#x0303;<sub>k</sub>, x)</i></strong>.
+  <strong style="color:rgb(48, 181, 204);">Demonstrations with random labels</strong> are few shot setting with <i>k</i> random labeled examples. Each (x<sub>i</sub>) is paired with (&#x0079;&#x0303;<sub>i</sub>) that is randomly sampled from <i>C</i>. A concatenation of (x<sub>1</sub>,  &#x0079;&#x0303;<sub>1</sub>, …, x<sub>k</sub>,  &#x0079;&#x0303;<sub>k</sub>, x) is used to make a prediction via <strong><i>argmax<sub>y∈<i>C </i></sub>P(y|x<sub>1</sub>, &#x0079;&#x0303;<sub>1</sub>, …, x<sub>k</sub>, &#x0079;&#x0303;<sub>k</sub>, x)</i></strong>.
 </p>
 <p class="figure" style="text-align:center;">
     <img src="figures/main_cls_3.png" width="90%" />
@@ -150,14 +145,14 @@ They can more easily define input-label correspondence compared to free-form gen
     <br />
     <i>Figure 4: Results when using no-demonstrations, demonstrations with gold labels, and demonstrations with random labels in classification tasks and multi-choice tasks. Model performance with random labels is very close to performance with gold labels. <a href="https://arxiv.org/pdf/2202.12837">Min et al.</a></i> 
 </p>
-<p> The figure 4 shows that the model performance with random labels is very close or slightly worse than the performance with gold labels. It shows that the existence of demostrations is helpful but the gold-label demonstrations are not necessary. 
+<p> The figure 4 shows that the model performance with random labels is very close to or slightly worse than performance with gold labels. It indicates that the presence of demonstrations is helpful but the gold-label demonstrations are not necessary. 
 </p>
 
 <p>
 They conducted various ablation studies to strengthen the hypothesis that gold-label demonstrations are not necessary. 
 </p>
 <p class="figure" style="text-align:center;">
-  <img src="figures/abl_accuracy.png" width="90%" />
+  <img src="figures/abl_accuracy.png" width="100%" />
   <br />
   <i>Figure 5: Results with varying number of correct labels in the demonstrations. <a href="https://arxiv.org/pdf/2202.12837">Min et al.</a></i> 
 </p>
@@ -181,7 +176,7 @@ They conducted various ablation studies to strengthen the hypothesis that gold-l
 <h2 id="results">Other aspects of Demonstrations</h2>
 
 <p>
-  They also examined other aspects of demonstraions that affect the model's performance of in-context learning. They identify four factors including <span style="color:rgb(76, 112, 229);">input-label mapping</span> we previously discussed, <span style="color:rgb(76, 112, 229);">the distribution of the input text</span>, <span style="color:rgb(76, 112, 229);">the label space</span>, and others. Let's see other factors.
+  They also examined other aspects of demonstraions that affect the model's performance of in-context learning. They identify four factors including <span style="color:rgb(76, 112, 229);">input-label mapping</span> we previously discussed, <span style="color:rgb(76, 112, 229);">the distribution of the input text</span>, <span style="color:rgb(76, 112, 229);">the label space</span>, and others. Let's take a look at these factors.
 </p> 
 <p><strong>The distribution of the input text</strong>:  Underlying distribution that x<sub>i</sub> ... x<sub>k</sub> are from.</p>
 <p class="figure" style="text-align:center;">
@@ -211,11 +206,14 @@ They conducted various ablation studies to strengthen the hypothesis that gold-l
   <br />
   <i>Figure 8: Impact of the label space. <a href="https://arxiv.org/pdf/2202.12837">Min et al.</a></i> 
 </p>
- They experiment with demonstrations w/ random English words that use random enlgish words as labels for all k pairs.<br />
+ They experiment with demonstrations with random English words that use random enlgish words as labels for all k pairs.<br />
  With direct models, the performance gap between using random labels within the label space and using random English words is significant. It means that knowing the label space contributes to the performance gains. We could get a sense on conditional probability of direct method. The model prediction is based on <i>P(y|x<sub>1</sub>, y<sub>1</sub>, …, x<sub>k</sub>, y<sub>k</sub>, x)</i>. It needs to predict the target label, so if the model is conditioned on the wrong label, its performance drops.<br />
  With channel models, the performance gap between using random labels within the label space and using random English words is in range of 0-2%. The model prediction is based on <i>P(x|x<sub>1</sub>, y<sub>1</sub>, …, x<sub>k</sub>, y<sub>k</sub>, y)</i>. It functions by predicting the input in terms of the label rather tan predicting a label. So. the importance of knowing label space is relatively lower than that of direct models. 
 
-
+<h2>Conclusion</h2>
+<p>
+  This paper explores the role of demonstrations with respect to the success of in-context learning. <br />They found that <strong style="color:rgb(48, 181, 204);">correct input-label mapping in demonstrations matters significantly less than we think</strong>. <br/>And this paper support that prompting a model doesn't supervise the model to learn novel task. <strong style="color:rgb(48, 181, 204);">Instructions prompt the model to recover the capacity it already has.</strong>  
+</p>
 
 <h2 id="limitations">Limitations</h2>
 
